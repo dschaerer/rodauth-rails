@@ -74,6 +74,14 @@ module Rodauth
           rodauth.authenticated? && (condition.nil? || condition.call(rodauth))
         end
       end
+      
+      def http_basic_authenticate(name = nil, &condition)
+        lambda do |request|
+          rodauth = request.env.fetch ["rodauth", *name].join(".")
+          rodauth.require_http_basic_auth
+          condition.nil? || condition.call(rodauth)
+        end
+      end
 
       if ::Rails.gem_version >= Gem::Version.new("5.2")
         def secret_key_base
